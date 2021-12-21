@@ -6,7 +6,9 @@ let router = express.Router();
 
 router.get("/", (req, res, next) => {
   try {
-    res.status(200).json("Welcome to Rakamin Academy");
+    res
+      .status(200)
+      .json("Welcome to Rakamin Academy for list API please go to: ");
   } catch (err) {
     res.status(400);
   }

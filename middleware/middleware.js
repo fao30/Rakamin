@@ -41,7 +41,6 @@ let roomUser = async (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.log(err.name);
     if (err.name === "forbidden") {
       next(err);
     }
@@ -51,8 +50,6 @@ let roomUser = async (req, res, next) => {
 let errorHandler = (err, req, res, next) => {
   let status;
   let message;
-  console.log("MASUK SINI");
-
   switch (err.name) {
     case "SequelizeValidationError":
       status = 400;

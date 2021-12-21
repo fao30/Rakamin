@@ -1,0 +1,12 @@
+[
+  {
+    "message": "Halo apa kabar?",
+    "id_room": 1,
+    "id_user": 1
+  },
+  {
+    "message": "Baik dong?",
+    "id_room": 1,
+    "id_user": 2
+  }
+]

@@ -6,14 +6,12 @@ const { passHelper, jwtHelper } = require("../helper/helper");
 class Controller {
   static async register(req, res, next) {
     try {
-      //   console.log(req);
       const { name, email, password } = req.body;
       let obj = {
         name,
         email,
         password: passHelper.hashPassword(password),
       };
-      // console.log(obj);
       let response = await User.create(obj);
       if (response) {
         res.status(201).json({
@@ -64,7 +62,6 @@ class Controller {
 
   static async getRooms(req, res, next) {
     try {
-      // console.log(req);
       const response = await Room.findAll({
         where: {
           id_user: req.user.id,
@@ -103,7 +100,7 @@ class Controller {
         res.status(200).json(showRooms);
       }
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   }
 
@@ -136,7 +133,7 @@ class Controller {
         res.status(200).json(response);
       }
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   }
 
@@ -171,7 +168,7 @@ class Controller {
         res.status(200).json(response1);
       }
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   }
   static async createroom(req, res, next) {
@@ -190,7 +187,6 @@ class Controller {
           id_room: roomList,
         },
       });
-      // console.log(roomList);
       let hasRoom = response1.filter(
         (e) => e.id_user == req.params.room_mate_id
       );
@@ -201,7 +197,6 @@ class Controller {
         };
       }
       const lastRoom = await Room.findAll({ order: [["id_room", "DESC"]] });
-      // console.log(lastRoom[0].id_room + 1);
       let obj = {
         id_room: lastRoom[0].id_room + 1,
         id_user: +req.params.room_mate_id,

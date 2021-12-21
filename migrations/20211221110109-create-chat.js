@@ -10,14 +10,14 @@ module.exports = {
       },
       id_room: {
         type: Sequelize.INTEGER,
-        references: {
-          model: {
-            tableName: "Rooms",
-          },
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+        // references: {
+        //   model: {
+        //     tableName: "Rooms",
+        //   },
+        //   key: "id",
+        // },
+        // onUpdate: "CASCADE",
+        // onDelete: "CASCADE",
       },
       id_user: {
         type: Sequelize.INTEGER,

@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Room.belongsTo(models.User, { foreignKey: "id_user" });
-      Room.hasMany(models.Chat, { foreignKey: "id_room" });
+      // Room.hasMany(models.Chat, { foreignKey: "id_room" });
     }
   }
   Room.init(

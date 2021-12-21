@@ -13,7 +13,7 @@ class Controller {
         email,
         password: passHelper.hashPassword(password),
       };
-      console.log(obj);
+      // console.log(obj);
       let response = await User.create(obj);
       if (response) {
         res.status(201).json({
@@ -26,7 +26,7 @@ class Controller {
       if (err.name === "SequelizeUniqueConstraintError") {
         res.status(400).json({
           statusCode: 400,
-          error: `Email dan username sudah terdaftar`,
+          error: `Email registered`,
         });
       } else if (err.name === "SequelizeValidationError") {
         const error = err.errors.map((el) => el.message);
@@ -58,7 +58,6 @@ class Controller {
         throw { name: "unauthorized", message: "You dont have an access" };
       }
     } catch (err) {
-      console.log(err);
       next(err);
     }
   }
@@ -143,9 +142,6 @@ class Controller {
 
   static async sendChat(req, res, next) {
     try {
-      console.log(req.body);
-      console.log(req.params);
-      console.log(req.user);
       let obj = {
         id_room: +req.params.roomid,
         message: req.body.message,
@@ -217,7 +213,7 @@ class Controller {
       const makeRoom = await Room.bulkCreate([obj, obj1]);
       let textOutput = `Room id number ${obj.id_room} has been created beetwen user ${req.params.room_mate_id} & ${req.user.id}`;
 
-      res.status(200).json(textOutput);
+      res.status(201).json(textOutput);
     } catch (err) {
       next(err);
     }

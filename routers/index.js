@@ -8,7 +8,9 @@ router.get("/", (req, res, next) => {
   try {
     res
       .status(200)
-      .json("Welcome to Rakamin Academy for list API please go to: ");
+      .json(
+        "Welcome to Rakamin Academy for list API please go to: https://github.com/fao30/Rakamin "
+      );
   } catch (err) {
     res.status(400);
   }

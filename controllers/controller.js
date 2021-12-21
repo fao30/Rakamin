@@ -59,7 +59,7 @@ class Controller {
       }
     } catch (err) {
       console.log(err);
-      next(error);
+      next(err);
     }
   }
 
@@ -71,6 +71,7 @@ class Controller {
           id_user: req.user.id,
         },
       });
+
       if (!response) {
         throw { name: "notFound", message: "Room Not Found" };
       } else {
@@ -78,7 +79,114 @@ class Controller {
       }
     } catch (err) {
       console.log(err);
-      // res.status(401).json(response);
+    }
+  }
+
+  static async getChat(req, res, next) {
+    try {
+      const response = await Chat.findAll({
+        include: [
+          {
+            model: User,
+            attributes: {
+              exclude: ["id", "createdAt", "updatedAt", "password", "email"],
+            },
+          },
+        ],
+        where: {
+          id_room: req.params.roomid,
+        },
+        attributes: {
+          exclude: ["id_user", "createdAt", "updatedAt"],
+        },
+        order: [["id", "DESC"]],
+      });
+      if (!response) {
+        throw { name: "notFound", message: "Room Not Found" };
+      } else {
+        res.status(200).json(response);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  static async sendChat(req, res, next) {
+    try {
+      let obj = {
+        message: req.body.message,
+        id_room: req.params.roomid,
+        id_user: req.user.id,
+      };
+      const response = await Chat.create(obj);
+      if (!response) {
+        throw { name: "notFound", message: "Room Not Found" };
+      } else {
+        const response1 = await Chat.findAll({
+          include: [
+            {
+              model: User,
+              attributes: {
+                exclude: ["id", "createdAt", "updatedAt", "password", "email"],
+              },
+            },
+          ],
+          where: {
+            id_room: req.params.roomid,
+          },
+          attributes: {
+            exclude: ["id_user", "createdAt", "updatedAt"],
+          },
+          order: [["id", "DESC"]],
+        });
+        res.status(200).json(response1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  static async createroom(req, res, next) {
+    try {
+      const response = await Room.findAll({
+        where: {
+          id_user: req.user.id,
+        },
+      });
+      let roomList = [];
+      response.map((e) => {
+        roomList.push(e.id_room);
+      });
+      const response1 = await Room.findAll({
+        where: {
+          id_room: roomList,
+        },
+      });
+      // console.log(roomList);
+      let hasRoom = response1.filter(
+        (e) => e.id_user == req.params.room_mate_id
+      );
+      if (hasRoom.length > 0) {
+        throw {
+          name: "badRequest",
+          message: `Room has been created with person with id ${req.params.room_mate_id}`,
+        };
+      }
+      const lastRoom = await Room.findAll({ order: [["id_room", "DESC"]] });
+      // console.log(lastRoom[0].id_room + 1);
+      let obj = {
+        id_room: lastRoom[0].id_room + 1,
+        id_user: +req.params.room_mate_id,
+      };
+      let obj1 = {
+        id_room: lastRoom[0].id_room + 1,
+        id_user: req.user.id,
+      };
+      const makeRoom = await Room.bulkCreate([obj, obj1]);
+      let textOutput = `Room id number ${obj.id_room} has been created beetwen user ${req.params.room_mate_id} & ${req.user.id}`;
+
+      res.status(200).json(textOutput);
+    } catch (err) {
+      next(err);
     }
   }
 }

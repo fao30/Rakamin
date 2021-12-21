@@ -1,10 +1,9 @@
 const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const { Room, User } = require("../models");
 
 let userAut = async (req, res, next) => {
   try {
     let { access_token } = req.headers;
-
     if (!access_token) {
       throw { name: "unauthorized", message: "You are unauthorized" };
     }
@@ -28,9 +27,31 @@ let userAut = async (req, res, next) => {
   }
 };
 
+let roomUser = async (req, res, next) => {
+  try {
+    const resp = await Room.findAll({
+      where: { id_room: req.params.roomid },
+    });
+
+    if (resp[0].id_user != req.user.id && resp[1].id_user != req.user.id) {
+      throw {
+        name: "forbidden",
+        message: `You are forrbiden to send message to room ${req.params.roomid}`,
+      };
+    }
+    next();
+  } catch (err) {
+    console.log(err.name);
+    if (err.name === "forbidden") {
+      next(err);
+    }
+  }
+};
+
 let errorHandler = (err, req, res, next) => {
   let status;
   let message;
+  console.log("MASUK SINI");
 
   switch (err.name) {
     case "SequelizeValidationError":
@@ -68,4 +89,5 @@ let errorHandler = (err, req, res, next) => {
 module.exports = {
   userAut,
   errorHandler,
+  roomUser,
 };

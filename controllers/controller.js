@@ -75,7 +75,33 @@ class Controller {
       if (!response) {
         throw { name: "notFound", message: "Room Not Found" };
       } else {
-        res.status(200).json(response);
+        let roomList = [];
+        response.map((e) => {
+          roomList.push(e.id_room);
+        });
+        const response1 = await Room.findAll({
+          include: [
+            {
+              model: User,
+              attributes: {
+                exclude: ["id", "createdAt", "updatedAt", "password", "email"],
+              },
+            },
+          ],
+          where: {
+            id_room: roomList,
+          },
+          attributes: {
+            exclude: ["id", "createdAt", "updatedAt"],
+          },
+        });
+        let showRooms = response1.filter((e) => {
+          return e.id_user != req.user.id;
+        });
+        if (showRooms.length == 0) {
+          res.status(200).json(`Start conversation!!!!! Make a room`);
+        }
+        res.status(200).json(showRooms);
       }
     } catch (err) {
       console.log(err);
@@ -97,13 +123,17 @@ class Controller {
           id_room: req.params.roomid,
         },
         attributes: {
-          exclude: ["id_user", "createdAt", "updatedAt"],
+          exclude: ["id_user", "createdAt", "updatedAt", "id", "id_room"],
         },
         order: [["id", "DESC"]],
       });
       if (!response) {
         throw { name: "notFound", message: "Room Not Found" };
       } else {
+        if (response.length == 0) {
+          let noChat = "No message yet,chat now!";
+          res.status(200).json(noChat);
+        }
         res.status(200).json(response);
       }
     } catch (err) {
@@ -113,10 +143,13 @@ class Controller {
 
   static async sendChat(req, res, next) {
     try {
+      console.log(req.body);
+      console.log(req.params);
+      console.log(req.user);
       let obj = {
+        id_room: +req.params.roomid,
         message: req.body.message,
-        id_room: req.params.roomid,
-        id_user: req.user.id,
+        id_user: +req.user.id,
       };
       const response = await Chat.create(obj);
       if (!response) {
@@ -135,7 +168,7 @@ class Controller {
             id_room: req.params.roomid,
           },
           attributes: {
-            exclude: ["id_user", "createdAt", "updatedAt"],
+            exclude: ["id_user", "createdAt", "updatedAt", "id", "id_room"],
           },
           order: [["id", "DESC"]],
         });

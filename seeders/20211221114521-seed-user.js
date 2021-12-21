@@ -4,7 +4,6 @@ const { passHelper } = require("../helper/helper");
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    console.log("MASUK");
     let data = JSON.parse(fs.readFileSync("./seeders/user.json", "utf-8"));
     data.forEach((e) => {
       e.password = passHelper.hashPassword(e.password);
